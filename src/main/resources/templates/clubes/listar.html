@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Clubes</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      padding: 2.5rem 1rem;
+      position: relative;
+      overflow-x: hidden;
+      color: white;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(99,102,241,0.2), transparent 70%);
+      top: -100px; right: -100px;
+    }
+    .orb-2 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(16,185,129,0.15), transparent 70%);
+      bottom: -80px; left: -80px;
+    }
+
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      animation: slideUp 0.5s ease forwards;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,0.45);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: rgba(255,255,255,0.85); }
+    .back-link::before { content: '←'; font-size: 1rem; }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .page-title-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .page-icon {
+      width: 54px; height: 54px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.35), rgba(16,185,129,0.25));
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.7rem;
+      flex-shrink: 0;
+    }
+
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 0.06em;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .page-subtitle {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+      white-space: nowrap;
+    }
+    .btn-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(99,102,241,0.5);
+      color: #fff;
+    }
+
+    .table-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 20px;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table thead tr {
+      background: rgba(99,102,241,0.15);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .data-table thead th {
+      padding: 14px 18px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .data-table tbody tr {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s;
+    }
+    .data-table tbody tr:last-child { border-bottom: none; }
+    .data-table tbody tr:hover { background: rgba(255,255,255,0.05); }
+
+    .data-table tbody td {
+      padding: 13px 18px;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.85);
+    }
+
+    .id-badge {
+      display: inline-block;
+      background: rgba(99,102,241,0.2);
+      border: 1px solid rgba(99,102,241,0.35);
+      border-radius: 6px;
+      padding: 2px 9px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #a5b4fc;
+    }
+
+    .null-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 2px 9px;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.3);
+      font-style: italic;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: rgba(255,255,255,0.3);
+      font-size: 0.9rem;
+    }
+    .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="page-wrapper">
+    <a href="/" class="back-link">Volver al inicio</a>
+
+    <div class="page-header">
+      <div class="page-title-group">
+        <div class="page-icon">🏟️</div>
+        <div>
+          <div class="page-title">Clubes</div>
+          <div class="page-subtitle">Lista de clubes de fútbol</div>
+        </div>
+      </div>
+      <a href="/clubes/nuevo" class="btn-add">＋ Agregar Club</a>
+    </div>
+
+    <div class="table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Entrenador</th>
+            <th>Asociación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="c : ${clubes}">
+            <td><span class="id-badge" th:text="${c.id}"></span></td>
+            <td th:text="${c.nombre}"></td>
+            <td>
+              <span th:if="${c.entrenador != null}" th:text="${c.entrenador.nombre}"></span>
+              <span th:if="${c.entrenador == null}" class="null-badge">Sin entrenador</span>
+            </td>
+            <td>
+              <span th:if="${c.asociacion != null}" th:text="${c.asociacion.nombre}"></span>
+              <span th:if="${c.asociacion == null}" class="null-badge">Sin asociación</span>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(clubes)}">
+            <td colspan="4">
+              <div class="empty-state">
+                <div class="empty-icon">🏟️</div>
+                No hay clubes registrados aún.
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>
